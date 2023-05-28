@@ -38,15 +38,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun initAppBar() {
         binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val topPadding = 120f.dpToPx(this)
+            val topPadding = 300f.dpToPx(this)
+            val realAlphaScrollHeight = appBarLayout.measuredHeight - appBarLayout.totalScrollRange
             val abstractOffset = abs(verticalOffset)
+
+            val realAlphaVerticalOffset = if (abstractOffset - topPadding < 0) 0f else abstractOffset - topPadding
+
             if (abstractOffset < topPadding) {
-                binding.toolbarBackgroundView.alpha = 0f //-투명도가 0
+                binding.toolbarBackgroundView.alpha = 0f
                 return@OnOffsetChangedListener
             }
-            val verticalOffsetByTopPadding = abstractOffset - topPadding
-            val percentage = abs(verticalOffsetByTopPadding) / appBarLayout.totalScrollRange
-            binding.toolbarBackgroundView.alpha = 1 - (if (1 - percentage * 2 < 0) 0f else 1 - percentage * 2) //리스너를 통해서 앱바의 투명도가 1까지 변경됨
+            val percentage = realAlphaVerticalOffset / realAlphaScrollHeight
+            binding.toolbarBackgroundView.alpha = 1 - (if (1 - percentage * 2 < 0) 0f else 1 - percentage * 2)
         })
         initActionBar()
     }
@@ -85,11 +88,13 @@ class MainActivity : AppCompatActivity() {
 
             if (scrolledValue > 150f.dpToPx(this@MainActivity).toInt()) {
                 if (isGateringMotionAnimating.not()) {
+                    binding.gatheringDigitalThingsBackgroundMotionLayout.transitionToEnd()
                     binding.gatheringDigitalThingsMotionLayout.transitionToEnd()
                     binding.buttonShownMotionLayout.transitionToEnd()
                 }
             } else {
                 if (isGateringMotionAnimating.not()) {
+                    binding.gatheringDigitalThingsBackgroundMotionLayout.transitionToStart()
                     binding.gatheringDigitalThingsMotionLayout.transitionToStart()
                     binding.buttonShownMotionLayout.transitionToStart()
                 }
